@@ -1,2 +1,2 @@
-# hw3
-danny le and ly ha cosc 3320 hw 3
+# COSC 3320: Graph Algorithms
+Ly Ha and Danny Le
