@@ -5,6 +5,7 @@
 #include<climits>
 #include<tuple>
 #include<queue>
+#include<algorithm>
 using namespace std;
 
 int mDist(const vector<int>& d, const vector<bool>& S){
@@ -54,6 +55,57 @@ void sssp(vector<vector<int>>& G, int s, ofstream &output){
         }
     }
 }
+
+// mst struct and functions
+struct edge_struct {
+    int source_vertex;
+    int dest_vertex;
+    int weight;
+};
+
+bool compare_edges (const edge_struct &a, const edge_struct &b)
+{
+    return a.weight < b.weight;
+}
+
+int find_parent(int x, vector<int>& parent)
+{
+    if (parent[x] != x)
+    {
+        parent[x] = find_parent(parent[x], parent);
+    }
+    return parent[x];
+}
+
+void kruskal(vector<edge_struct> &edges, int n)
+{
+    vector <int> parent(n+1);
+    vector<edge_struct> mst;
+    
+    for (int x = 1; x <= n; x++)
+    {
+        parent[x] = x;
+    }
+    sort (edges.begin(), edges.end(), compare_edges);
+    for (edge_struct e : edges)
+    {
+        int i = e.source_vertex;
+        int j = e.dest_vertex;
+        int v = e.weight;
+        int parent_i = find_parent(i, parent);
+        int parent_j = find_parent(j, parent);
+        if (parent_i != parent_j)
+        {
+            mst.push_back(e);
+            parent[parent_i] = parent_j;
+        }
+    }
+    for (edge_struct e : mst)
+    {
+        output << "1," << e.source_vertex << "," << e.dest_vertex << "," << e.weight << endl;
+    }
+}
+
 
 int main(int argc, char* argv[]){
     string inPutFileName = argv[1];
@@ -111,7 +163,19 @@ int main(int argc, char* argv[]){
 		if (alg == "sssp"){
 			sssp(adjMat, 1, file2);
 		}
-    file2.close();
+		else if (alg == "mst"){
+			vector <edge_struct> edges;
+
+			for (int x = 0; x < numVert; x++)
+			{
+			    int i = get<0>(storage);
+			    int j = get<1>(storage);
+			    int v = get<2> (storage);
+			    edges.push_back({i,j,v});
+			}
+			kruskal(edges, numVert);
+		}
+    		file2.close();
 		storage.clear();
 		numVert = 0;
 
